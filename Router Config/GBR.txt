@@ -1,0 +1,91 @@
+Router>en
+Router#conf t
+Router(config)#hostname GBR
+
+GBR(config)#int g0/0/0
+GBR(config-if)#description SW-11-Link
+GBR(config-if)#ip address 172.16.2.254 255.255.255.128
+GBR(config-if)#ip helper-address 172.16.0.2
+GBR(config-if)#no shutdown
+GBR(config-if)#exit
+
+GBR(config)#int g0/0/1
+GBR(config-if)#description SW-12-Link
+GBR(config-if)#ip helper-address 172.16.0.2
+GBR(config-if)#ip address 172.16.4.94 255.255.255.224
+GBR(config-if)#no shutdown
+GBR(config-if)#exit
+
+GBR(config)#int s0/2/1
+GBR(config-if)#description ISP-Link
+GBR(config-if)#ip address 123.231.1.14 255.255.255.252
+GBR(config-if)#no shutdown
+GBR(config-if)#exit
+
+GBR(config)#router rip
+GBR(config-router)#version 2
+GBR(config-router)#no auto-summary
+GBR(config-router)#network 172.16.0.0
+GBR(config-router)#network 123.0.0.0
+GBR(config-router)#exit
+GBR(config)#ip route 0.0.0.0 0.0.0.0 123.231.1.13 125
+GBR(config)#end
+
+GBR(config)#interface Tunnel1
+GBR(config-if)#ip address 10.20.40.6 255.255.255.252
+GBR(config-if)#tunnel source Serial0/2/1
+GBR(config-if)#tunnel destination 123.231.1.2
+GBR(config-if)#tunnel mode gre ip
+GBR(config-if)#no shutdown
+GBR(config-if)#exit
+
+GBR(config)#interface Tunnel2
+GBR(config-if)#ip address 10.20.40.17 255.255.255.252
+GBR(config-if)#tunnel source Serial0/2/1
+GBR(config-if)#tunnel destination 123.231.1.10
+GBR(config-if)#tunnel mode gre ip
+GBR(config-if)#no shutdown
+GBR(config-if)#exit
+
+GBR(config)#interface Tunnel3
+GBR(config-if)#ip address 10.20.40.22 255.255.255.252
+GBR(config-if)#tunnel source Serial0/2/1
+GBR(config-if)#tunnel destination 123.231.1.6 
+GBR(config-if)#tunnel mode gre ip
+GBR(config-if)#no shutdown
+GBR(config-if)#exit
+
+GBR(config)#service password-encryption
+GBR(config)#security passwords min-length 10
+GBR(config)#enable secret jaAzil@2024.lk
+GBR(config)#
+GBR(config)#banner motd *
+Enter TEXT message.  End with the character '*'.
+#################################################
+  This is Secure area. Please enter your Authentication.
+#################################################
+*
+
+GBR(config)#
+GBR(config)#login block-for 300 attempts 4 within 60
+GBR(config)#
+GBR(config)#ip domain-name sltsc.lk
+GBR(config)#username Admin secret jAazil@SsH.lk
+GBR(config)#crypto key generate rsa 
+The name for the keys will be: GBR.sltsc.lk
+2048
+GBR(config)#ip ssh version 2
+GBR(config)#line console 0
+GBR(config-line)#password JAzil@2024.lk
+GBR(config-line)#login
+GBR(config-line)#exec-timeout 20 0
+GBR(config-line)#exit
+GBR(config)#line vty 0 15
+GBR(config-line)#login local
+GBR(config-line)#transport input ssh
+GBR(config-line)#exec-timeout 20 0
+GBR(config-line)#exit
+GBR(config)#end
+GBR#copy running-config tftp:
+172.16.0.1
+GBR#write

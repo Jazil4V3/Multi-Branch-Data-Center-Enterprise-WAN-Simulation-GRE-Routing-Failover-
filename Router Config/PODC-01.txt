@@ -1,0 +1,91 @@
+Router>en
+Router#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#hostname PODC-01
+PODC-01(config)#
+PODC-01(config)#int g0/0/0
+PODC-01(config-if)#description SW-10-Link
+PODC-01(config-if)#no ip address
+PODC-01(config-if)#ip helper-address 172.16.0.2
+PODC-01(config-if)#no shutdown
+
+PODC-01(config-if)#exit
+PODC-01(config)#
+PODC-01(config)#int s0/2/1
+PODC-01(config-if)#description PDC-Link
+PODC-01(config-if)#ip address 172.16.4.233 255.255.255.252
+PODC-01(config-if)#no shutdown
+
+PODC-01(config-if)#exit
+
+PODC-01(config)#int g0/0/0.3
+PODC-01(config-subif)#encapsulation dot1q 3
+PODC-01(config-subif)#description vlan-03-Server-Segment
+PODC-01(config-subif)#ip address 172.16.0.254 255.255.255.0
+PODC-01(config-subif)#no shutdown
+PODC-01(config-subif)#exit
+PODC-01(config)#int g0/0/0.2
+PODC-01(config-subif)#encapsulation dot1q 2
+PODC-01(config-subif)#description vlan-02-UAT-Segment 
+PODC-01(config-subif)#ip address 172.16.1.254 255.255.255.0
+PODC-01(config-subif)#no shutdown
+PODC-01(config-subif)#exit
+
+PODC-01(config)#router rip
+PODC-01(config-router)#version 2
+PODC-01(config-router)#no auto-summary
+PODC-01(config-router)#network 172.16.0.0
+PODC-01(config-router)#exit
+PODC-01(config)#ip route 0.0.0.0 0.0.0.0 172.16.4.234 125
+PODC-01(config)#end
+
+PODC-01(config)#service password-encryption
+PODC-01(config)#security passwords min-length 10
+PODC-01(config)#enable secret jaAzil@2024.lk
+PODC-01(config)#
+PODC-01(config)#banner motd *
+Enter TEXT message.  End with the character '*'.
+#################################################
+  This is Secure area. Please enter your Authentication.
+#################################################
+*
+
+PODC-01(config)#
+PODC-01(config)#login block-for 300 attempts 4 within 60
+PODC-01(config)#
+PODC-01(config)#ip domain-name sltsc.lk
+PODC-01(config)#username Admin secret jAazil@SsH.lk
+PODC-01(config)#crypto key generate rsa 
+The name for the keys will be: PODC-01.sltsc.lk
+Choose the size of the key modulus in the range of 360 to 4096 for your
+  General Purpose Keys. Choosing a key modulus greater than 512 may take
+  a few minutes.
+
+How many bits in the modulus [512]: 2048
+% Generating 2048 bit RSA keys, keys will be non-exportable...[OK]
+
+PODC-01(config)#ip ssh version 2
+*Sep 26 23:42:10.76: %SSH-5-ENABLED: SSH 1.99 has been enabled
+PODC-01(config)#
+PODC-01(config)#line console 0
+PODC-01(config-line)#password JAzil@2024.lk
+PODC-01(config-line)#login
+PODC-01(config-line)#exec-timeout 20 0
+PODC-01(config-line)#exit
+PODC-01(config)#line vty 0 15
+PODC-01(config-line)#login local
+PODC-01(config-line)#transport input ssh
+PODC-01(config-line)#exec-timeout 20 0
+PODC-01(config-line)#exit
+PODC-01(config)#end
+PODC-01#copy running-config tftp:
+Address or name of remote host []? 172.16.0.1
+Destination filename [PODC-01-confg]? 
+
+Writing running-config...
+%SYS-5-CONFIG_I: Configured from console by console
+!!
+[OK - 2024 bytes]
+
+2024 bytes copied in 0 secs
+PODC-01#write

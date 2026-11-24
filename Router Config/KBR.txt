@@ -1,0 +1,132 @@
+Router>en
+Router#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#hostname KBR
+KBR(config)#
+KBR(config)#int g0/0/0
+KBR(config-if)#description SW-06-Link
+KBR(config-if)#ip address 172.16.4.30 255.255.255.224
+KBR(config-if)#ip helper-address 172.16.0.2
+KBR(config-if)#no shutdown
+
+KBR(config-if)#exit
+KBR(config)#
+KBR(config)#int g0/0/1
+KBR(config-if)#description SW-07-Link
+KBR(config-if)#ip helper-address 172.16.0.2
+KBR(config-if)#no ip address
+KBR(config-if)#no shutdown
+
+KBR(config-if)#exit
+KBR(config)#
+KBR(config)#
+KBR(config)#int s0/1/1
+KBR(config-if)#description ISP-Link
+KBR(config-if)#ip address 123.231.1.6 255.255.255.252
+KBR(config-if)#no shutdown
+
+KBR(config-if)#exit
+
+KBR(config)#int g0/0/1.2
+KBR(config-subif)#encapsulation dot1q 2
+KBR(config-subif)#description vlan-02-BackOffice
+KBR(config-subif)#ip address 172.16.4.206 255.255.255.240
+KBR(config-subif)#no shutdown
+KBR(config-subif)#exit
+%LINK-5-CHANGED: Interface GigabitEthernet0/0/1.2, changed state to up
+
+%LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/0/1.2, changed state to up
+
+KBR(config)#int g0/0/1.3
+KBR(config-subif)#encapsulation dot1q 3
+KBR(config-subif)#description vlan-03-BranchOperation
+KBR(config-subif)#ip address 172.16.4.62 255.255.255.224
+KBR(config-subif)#no shutdown
+KBR(config-subif)#exit
+
+KBR(config)#router rip
+KBR(config-router)#version 2
+KBR(config-router)#no auto-summary
+KBR(config-router)#network 172.16.0.0
+KBR(config-router)#network 123.0.0.0
+KBR(config-router)#exit
+KBR(config)#ip route 0.0.0.0 0.0.0.0 123.231.1.5 125
+KBR(config)#end
+
+KBR(config)#interface Tunnel1
+
+KBR(config-if)#ip address 10.20.40.2 255.255.255.252
+KBR(config-if)#tunnel source Serial0/1/1
+KBR(config-if)#tunnel destination 123.231.1.2
+KBR(config-if)#tunnel mode gre ip
+KBR(config-if)#no shutdown
+KBR(config-if)#exit
+KBR(config)#
+KBR(config)#interface Tunnel2
+
+KBR(config-if)#ip address 10.20.40.13 255.255.255.252
+KBR(config-if)#tunnel source Serial0/1/1
+KBR(config-if)#tunnel destination 123.231.1.10
+KBR(config-if)#tunnel mode gre ip
+KBR(config-if)#no shutdown
+KBR(config-if)#exit
+KBR(config)#
+KBR(config)#interface Tunnel3
+
+KBR(config-if)#ip address 10.20.40.21 255.255.255.252
+KBR(config-if)#tunnel source Serial0/1/1
+KBR(config-if)#tunnel destination 123.231.1.14
+KBR(config-if)#tunnel mode gre ip
+KBR(config-if)#no shutdown
+KBR(config-if)#exit
+
+KBR(config)#service password-encryption
+KBR(config)#security passwords min-length 10
+KBR(config)#enable secret jaAzil@2024.lk
+KBR(config)#
+KBR(config)#banner motd *
+Enter TEXT message.  End with the character '*'.
+#################################################
+  This is Secure area. Please enter your Authentication.
+#################################################
+*
+
+KBR(config)#
+KBR(config)#login block-for 300 attempts 4 within 60
+KBR(config)#
+KBR(config)#ip domain-name sltsc.lk
+KBR(config)#username Admin secret jAazil@SsH.lk
+KBR(config)#crypto key generate rsa 
+The name for the keys will be: KBR.sltsc.lk
+Choose the size of the key modulus in the range of 360 to 4096 for your
+  General Purpose Keys. Choosing a key modulus greater than 512 may take
+  a few minutes.
+
+How many bits in the modulus [512]: 2048
+% Generating 2048 bit RSA keys, keys will be non-exportable...[OK]
+
+KBR(config)#ip ssh version 2
+*Sep 26 23:40:31.281: %SSH-5-ENABLED: SSH 1.99 has been enabled
+KBR(config)#
+KBR(config)#line console 0
+KBR(config-line)#password JAzil@2024.lk
+KBR(config-line)#login
+KBR(config-line)#exec-timeout 20 0
+KBR(config-line)#exit
+KBR(config)#line vty 0 15
+KBR(config-line)#login local
+KBR(config-line)#transport input ssh
+KBR(config-line)#exec-timeout 20 0
+KBR(config-line)#exit
+KBR(config)#end
+KBR#copy running-config tftp:
+Address or name of remote host []? 172.16.0.1
+Destination filename [KBR-confg]? 
+
+Writing running-config...
+%SYS-5-CONFIG_I: Configured from console by console
+!!
+[OK - 2563 bytes]
+
+2563 bytes copied in 0.075 secs (34173 bytes/sec)
+KBR#write

@@ -1,0 +1,120 @@
+Router>en
+Router#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#hostname PDC
+PDC(config)#
+PDC(config)#int g0/0/0
+PDC(config-if)#description SW-08-Link
+PDC(config-if)#ip address 172.16.4.222 255.255.255.240
+PDC(config-if)#ip helper-address 172.16.0.2
+PDC(config-if)#no shutdown
+
+PDC(config-if)#exit
+PDC(config)#
+PDC(config)#int g0/0/1
+PDC(config-if)#description SW-09-Link
+PDC(config-if)#ip helper-address 172.16.0.2
+PDC(config-if)#ip address 172.16.3.190 255.255.255.192
+PDC(config-if)#no shutdown
+
+PDC(config-if)#exit
+PDC(config)#
+PDC(config)#int s0/2/0
+PDC(config-if)#description ISP-Link
+PDC(config-if)#ip address 123.231.1.10 255.255.255.252
+PDC(config-if)#no shutdown
+
+PDC(config-if)#exit
+PDC(config)#
+PDC(config)#int s0/2/1
+PDC(config-if)#description PODC-01-Link
+PDC(config-if)#ip address 172.16.4.234 255.255.255.252
+PDC(config-if)#no shutdown
+
+%LINK-5-CHANGED: Interface Serial0/2/1, changed state to down
+PDC(config-if)#exit
+
+PDC(config)#router rip
+PDC(config-router)#version 2
+PDC(config-router)#no auto-summary
+PDC(config-router)#network 172.16.0.0
+PDC(config-router)#network 123.0.0.0
+PDC(config-router)#exit
+PDC(config)#ip route 0.0.0.0 0.0.0.0 123.231.1.9 125
+PDC(config)#end
+
+PDC(config)#interface Tunnel1
+PDC(config-if)#ip address 10.20.40.10 255.255.255.252
+PDC(config-if)#tunnel source Serial0/2/0
+PDC(config-if)#tunnel destination 123.231.1.2
+PDC(config-if)#tunnel mode gre ip
+PDC(config-if)#no shutdown
+PDC(config-if)#exit
+
+PDC(config)#interface Tunnel2
+PDC(config-if)#ip address 10.20.40.14 255.255.255.252
+PDC(config-if)#tunnel source Serial0/2/0
+PDC(config-if)#tunnel destination 123.231.1.6
+PDC(config-if)#tunnel mode gre ip 
+PDC(config-if)#no shutdown
+PDC(config-if)#exit
+
+PDC(config)#interface Tunnel3
+PDC(config-if)#ip address 10.20.40.18 255.255.255.252
+PDC(config-if)#tunnel source Serial0/2/0
+PDC(config-if)#tunnel destination 123.231.1.14
+PDC(config-if)#tunnel mode gre ip
+PDC(config-if)#no shutdown
+PDC(config-if)#exit
+
+PDC(config)#service password-encryption
+PDC(config)#security passwords min-length 10
+PDC(config)#enable secret jaAzil@2024.lk
+PDC(config)#
+PDC(config)#banner motd *
+Enter TEXT message.  End with the character '*'.
+#################################################
+  This is Secure area. Please enter your Authentication.
+#################################################
+*
+
+PDC(config)#
+PDC(config)#login block-for 300 attempts 4 within 60
+PDC(config)#
+PDC(config)#ip domain-name sltsc.lk
+PDC(config)#username Admin secret jAazil@SsH.lk
+PDC(config)#crypto key generate rsa 
+The name for the keys will be: PDC.sltsc.lk
+Choose the size of the key modulus in the range of 360 to 4096 for your
+  General Purpose Keys. Choosing a key modulus greater than 512 may take
+  a few minutes.
+
+How many bits in the modulus [512]: 2048
+% Generating 2048 bit RSA keys, keys will be non-exportable...[OK]
+
+PDC(config)#ip ssh version 2
+*Sep 26 23:41:43.792: %SSH-5-ENABLED: SSH 1.99 has been enabled
+PDC(config)#
+PDC(config)#line console 0
+PDC(config-line)#password JAzil@2024.lk
+PDC(config-line)#login
+PDC(config-line)#exec-timeout 20 0
+PDC(config-line)#exit
+PDC(config)#line vty 0 15
+PDC(config-line)#login local
+PDC(config-line)#transport input ssh
+PDC(config-line)#exec-timeout 20 0
+PDC(config-line)#exit
+PDC(config)#end
+PDC#copy running-config tftp:
+Address or name of remote host []? 172.16.0.1
+Destination filename [PDC-confg]? 
+
+Writing running-config...
+%SYS-5-CONFIG_I: Configured from console by console
+!!
+[OK - 2305 bytes]
+
+2305 bytes copied in 0.073 secs (31575 bytes/sec)
+PDC#
+PDC#write

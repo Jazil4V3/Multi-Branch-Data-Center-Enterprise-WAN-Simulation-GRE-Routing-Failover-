@@ -1,0 +1,81 @@
+Router>en
+Router#conf t
+Router(config)#hostname HO-01
+
+HO-01(config)#int g0/0/0
+HO-01(config-if)#description SW-01-Link
+HO-01(config-if)#ip address 172.16.3.126 255.255.255.128
+HO-01(config-if)#no shutdown
+HO-01(config-if)#ip helper-address 172.16.0.2
+HO-01(config-if)#exit
+
+HO-01(config)#int g0/0/1
+HO-01(config-if)#description SW_02-Link
+HO-01(config-if)#ip address 172.16.4.142 255.255.255.240
+HO-01(config-if)#no shutdown 
+HO-01(config-if)#ip helper-address 172.16.0.2
+HO-01(config-if)#exit
+
+HO-01(config)#int s0/1/0
+HO-01(config-if)#description HO-02-Link
+HO-01(config-if)#ip address 172.16.4.225 255.255.255.252
+HO-01(config-if)#no shutdown 
+HO-01(config-if)#exit
+
+HO-01(config)#router rip
+HO-01(config-router)#version 2
+HO-01(config-router)#no auto-summary
+HO-01(config-router)#network 172.16.0.0
+HO-01(config-router)#exit
+HO-01(config)#ip route 0.0.0.0 0.0.0.0 172.16.4.226 125
+HO-01(config)#end
+
+HO-01(config)#ip access-list extended FILTER_SW01
+HO-01(config-ext-nacl)#deny ip 172.16.3.0 0.0.0.127 172.16.3.192 0.0.0.31
+HO-01(config-ext-nacl)#deny ip 172.16.3.0 0.0.0.127 172.16.4.144 0.0.0.15 
+HO-01(config-ext-nacl)#deny ip 172.16.3.0 0.0.0.127 172.16.4.96 0.0.0.31 
+HO-01(config-ext-nacl)#permit ip any any
+HO-01(config-ext-nacl)#exit
+HO-01(config)#interface GigabitEthernet0/0/0
+HO-01(config-if)#description Link-to-SW-01
+HO-01(config-if)#ip access-group FILTER_SW01 in
+HO-01(config-if)#exit
+
+HO-01(config)#service password-encryption
+HO-01(config)#security passwords min-length 10
+HO-01(config)#enable secret jaAzil@2024.lk
+HO-01(config)#
+HO-01(config)#banner motd *
+Enter TEXT message.  End with the character '*'.
+#################################################
+  This is Secure area. Please enter your Authentication.
+#################################################
+*
+
+HO-01(config)#
+HO-01(config)#login block-for 300 attempts 4 within 60
+HO-01(config)#
+HO-01(config)#ip domain-name sltsc.lk
+HO-01(config)#username Admin secret jAazil@SsH.lk
+HO-01(config)#crypto key generate rsa 
+The name for the keys will be: HO-01.sltsc.lk
+Choose the size of the key modulus in the range of 360 to 4096 for your
+  General Purpose Keys. Choosing a key modulus greater than 512 may take
+  a few minutes.
+
+How many bits in the modulus [512]: 2048
+% Generating 2048 bit RSA keys, keys will be non-exportable...[OK]
+
+HO-01(config)#ip ssh version 2
+*Sep 26 23:35:2.708: %SSH-5-ENABLED: SSH 1.99 has been enabled
+HO-01(config)#
+HO-01(config)#line console 0
+HO-01(config-line)#password JAzil@2024.lk
+HO-01(config-line)#login
+HO-01(config-line)#exec-timeout 20 0
+HO-01(config-line)#exit
+HO-01(config)#line vty 0 15
+HO-01(config-line)#login local
+HO-01(config-line)#transport input ssh
+HO-01(config-line)#exec-timeout 20 0
+HO-01(config-line)#exit

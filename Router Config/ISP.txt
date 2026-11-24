@@ -1,0 +1,92 @@
+Router>en
+Router#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#hostname ISP
+ISP(config)#
+ISP(config)#int s0/1/0
+ISP(config-if)#description HO-BR-Link
+ISP(config-if)#ip address 123.231.1.1 255.255.255.252
+ISP(config-if)#no shutdown
+
+ISP(config-if)#exit
+ISP(config)#
+ISP(config)#int s0/1/1
+ISP(config-if)#description KBR-Link
+ISP(config-if)#ip address 123.231.1.5 255.255.255.252
+ISP(config-if)#no shutdown
+
+%LINK-5-CHANGED: Interface Serial0/1/1, changed state to down
+ISP(config-if)#exit
+ISP(config)#
+ISP(config)#int s0/2/0
+ISP(config-if)#description PDC-Link
+ISP(config-if)#ip address 123.231.1.9 255.255.255.252
+ISP(config-if)#no shutdown
+
+%LINK-5-CHANGED: Interface Serial0/2/0, changed state to down
+ISP(config-if)#exit
+ISP(config)#
+ISP(config)#int s0/2/1
+ISP(config-if)#description GBR-Link
+ISP(config-if)#ip address 123.231.1.13 255.255.255.252
+ISP(config-if)#no shutdown
+
+ISP(config)#router rip
+ISP(config-router)#version 2
+ISP(config-router)#no auto-summary
+ISP(config-router)#network 123.0.0.0
+ISP(config-router)#exit
+ISP(config)#ip route 172.16.0.0 255.255.0.0 123.231.1.2 125
+ISP(config)#end
+
+ISP(config)#service password-encryption
+ISP(config)#security passwords min-length 10
+ISP(config)#enable secret jaAzil@2024.lk
+ISP(config)#
+ISP(config)#banner motd *
+Enter TEXT message.  End with the character '*'.
+#################################################
+  This is Secure area. Please enter your Authentication.
+#################################################
+*
+
+ISP(config)#
+ISP(config)#login block-for 300 attempts 4 within 60
+ISP(config)#
+ISP(config)#ip domain-name sltsc.lk
+ISP(config)#username Admin secret jAazil@SsH.lk
+ISP(config)#crypto key generate rsa 
+The name for the keys will be: ISP.sltsc.lk
+Choose the size of the key modulus in the range of 360 to 4096 for your
+  General Purpose Keys. Choosing a key modulus greater than 512 may take
+  a few minutes.
+
+How many bits in the modulus [512]: 2048
+% Generating 2048 bit RSA keys, keys will be non-exportable...[OK]
+
+ISP(config)#ip ssh version 2
+*Sep 26 23:39:42.784: %SSH-5-ENABLED: SSH 1.99 has been enabled
+ISP(config)#
+ISP(config)#line console 0
+ISP(config-line)#password JAzil@2024.lk
+ISP(config-line)#login
+ISP(config-line)#exec-timeout 20 0
+ISP(config-line)#exit
+ISP(config)#line vty 0 15
+ISP(config-line)#login local
+ISP(config-line)#transport input ssh
+ISP(config-line)#exec-timeout 20 0
+ISP(config-line)#exit
+ISP(config)#end
+ISP#copy running-config tftp:
+Address or name of remote host []? 172.16.0.1
+Destination filename [ISP-confg]? 
+
+Writing running-config...
+%SYS-5-CONFIG_I: Configured from console by console
+!!
+[OK - 1843 bytes]
+
+1843 bytes copied in 0.007 secs (263285 bytes/sec)
+ISP#
+ISP#write
