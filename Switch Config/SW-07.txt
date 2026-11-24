@@ -1,0 +1,57 @@
+Switch>en
+Switch#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#hostname SW-07
+SW-07(config)#
+SW-07(config)#vlan 2
+SW-07(config-vlan)#name BackOffice
+SW-07(config-vlan)#exit
+SW-07(config)#
+SW-07(config)#vlan 3
+SW-07(config-vlan)#name Branch Operation
+                               ^
+% Invalid input detected at '^' marker.
+	
+SW-07(config-vlan)#exit
+SW-07(config)#
+SW-07(config)#int range fa0/1 - 10
+SW-07(config-if-range)#switchport mode access
+SW-07(config-if-range)#switchport access vlan 2
+SW-07(config-if-range)#no shutdown
+SW-07(config-if-range)#exit
+SW-07(config)#
+SW-07(config)#int range fa0/11 - 20
+SW-07(config-if-range)#switchport mode access
+SW-07(config-if-range)#switchport access vlan 3
+SW-07(config-if-range)#no shutdown
+SW-07(config-if-range)#exit
+SW-07(config)#
+SW-07(config)#vlan 3
+SW-07(config-vlan)#name BranchOperation
+SW-07(config-vlan)#exit
+SW-07(config)#
+
+SW-07>enable
+SW-07#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+SW-07(config)#hostname SW-07
+SW-07(config)#interface FastEthernet 0/1
+SW-07(config-if)#switchport mode access
+SW-07(config-if)#switchport port-security
+SW-07(config-if)#switchport port-security maximum 1
+SW-07(config-if)#switchport port-security mac-address sticky
+SW-07(config-if)#switchport port-security violation restrict
+SW-07(config-if)#exit
+SW-07(config)#interface FastEthernet 0/11
+SW-07(config-if)#switchport mode access
+SW-07(config-if)#switchport port-security
+SW-07(config-if)#switchport port-security maximum 1
+SW-07(config-if)#switchport port-security mac-address sticky
+SW-07(config-if)#switchport port-security violation restrict
+SW-07(config-if)#exit
+SW-07(config)#
+SW-07(config)#interface range FastEthernet 0/2 - 10, FastEthernet 0/12 - 24, GigabitEthernet 0/2
+SW-07(config-if-range)#shutdown
+
+SW-07(config)#int g0/1
+SW-07(config-if)#switchport mode trunk 

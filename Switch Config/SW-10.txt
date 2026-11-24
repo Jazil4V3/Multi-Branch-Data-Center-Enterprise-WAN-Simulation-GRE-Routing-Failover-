@@ -1,0 +1,111 @@
+Switch>en
+Switch#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#hostname SW-10
+SW-10(config)#
+SW-10(config)#vlan 2
+SW-10(config-vlan)#name UAT-Segment
+SW-10(config-vlan)#exit
+SW-10(config)#
+SW-10(config)#vlan 3
+SW-10(config-vlan)#name Server-Segment
+SW-10(config-vlan)#exit
+SW-10(config)#
+SW-10(config)#int range fa0/1 - 10
+SW-10(config-if-range)#switchport mode access
+SW-10(config-if-range)#switchport access vlan 2
+SW-10(config-if-range)#no shutdown
+SW-10(config-if-range)#exit
+SW-10(config)#
+SW-10(config)#int range fa0/11 - 20
+SW-10(config-if-range)#switchport mode access
+SW-10(config-if-range)#switchport access vlan 3
+SW-10(config-if-range)#no shutdown
+SW-10(config-if-range)#exit
+SW-10(config)#
+SW-10(config)#interface range FastEthernet 0/21 - 24
+SW-10(config-if-range)#shutdown
+
+%LINK-5-CHANGED: Interface FastEthernet0/21, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/22, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/23, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/24, changed state to administratively down
+SW-10(config-if-range)#channel-group 1 mode active
+SW-10(config-if-range)#no shutdown
+
+%LINK-5-CHANGED: Interface FastEthernet0/21, changed state to down
+
+%LINK-5-CHANGED: Interface FastEthernet0/22, changed state to down
+
+%LINK-5-CHANGED: Interface FastEthernet0/23, changed state to down
+
+%LINK-5-CHANGED: Interface FastEthernet0/24, changed state to down
+SW-10(config-if-range)#exit
+SW-10(config)#interface Port-channel 1
+SW-10(config-if)#switchport mode trunk
+SW-10(config-if)#switchport trunk allowed vlan 2,3
+SW-10(config-if)#description SW-10-1-Link
+SW-10(config-if)#no shutdown
+SW-10(config-if)#exit
+SW-10(config)#interface FastEthernet 0/11
+SW-10(config-if)#switchport mode access
+SW-10(config-if)#switchport port-security
+SW-10(config-if)#switchport port-security maximum 1
+SW-10(config-if)#switchport port-security mac-address sticky
+SW-10(config-if)#switchport port-security violation restrict
+SW-10(config-if)#exit
+SW-10(config)#interface FastEthernet 0/12
+SW-10(config-if)#switchport mode access
+SW-10(config-if)#switchport port-security
+SW-10(config-if)#switchport port-security maximum 1
+SW-10(config-if)#switchport port-security mac-address sticky
+SW-10(config-if)#switchport port-security violation restrict
+SW-10(config-if)#exit
+SW-10(config)#interface range FastEthernet 0/1 - 10, FastEthernet 0/13 - 20, GigabitEthernet 0/2
+SW-10(config-if-range)#shutdown
+
+%LINK-5-CHANGED: Interface FastEthernet0/1, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/2, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/3, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/4, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/5, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/6, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/7, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/8, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/9, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/10, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/13, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/14, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/15, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/16, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/17, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/18, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/19, changed state to administratively down
+
+%LINK-5-CHANGED: Interface FastEthernet0/20, changed state to administratively down
+
+%LINK-5-CHANGED: Interface GigabitEthernet0/2, changed state to administratively down
+SW-10(config-if-range)#exit
+SW-10(config)#do write
+
+SW-10(config)#int g0/1
+SW-10(config-if)#switchport mode trunk 

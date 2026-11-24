@@ -1,0 +1,15 @@
+Switch>en
+Switch#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#host
+Switch(config)#hostname SW-01
+SW-01(config)#interface range FastEthernet 0/1 - 2
+SW-01(config-if-range)#switchport mode access
+SW-01(config-if-range)#switchport port-security
+SW-01(config-if-range)#switchport port-security maximum 1
+SW-01(config-if-range)#switchport port-security mac-address sticky
+SW-01(config-if-range)#switchport port-security violation restrict
+SW-01(config-if-range)#exit
+SW-01(config)#
+SW-01(config)#interface range FastEthernet 0/3 - 24, GigabitEthernet 0/2
+SW-01(config-if-range)#shutdown

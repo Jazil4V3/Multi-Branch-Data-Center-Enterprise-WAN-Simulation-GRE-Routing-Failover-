@@ -1,0 +1,78 @@
+Switch>en
+Switch#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#hostname SW-10-1
+SW-10-1(config)#spanning-tree vlan 2,3 root primary
+
+SW-10-1(config)#
+SW-10-1(config)#vlan 2
+SW-10-1(config-vlan)#name UAT-Segment
+SW-10-1(config-vlan)#exit
+SW-10-1(config)#
+SW-10-1(config)#vlan 3
+SW-10-1(config-vlan)#name Server-Segment
+SW-10-1(config-vlan)#exit
+SW-10-1(config)#
+SW-10-1(config)#int range fa0/1 - 10
+SW-10-1(config-if-range)#switchport mode access
+SW-10-1(config-if-range)#switchport access vlan 2
+SW-10-1(config-if-range)#no shutdown
+SW-10-1(config-if-range)#exit
+SW-10-1(config)#
+SW-10-1(config)#int range fa0/11 - 20
+SW-10-1(config-if-range)#switchport mode access
+SW-10-1(config-if-range)#switchport access vlan 3
+SW-10-1(config-if-range)#no shutdown
+SW-10-1(config-if-range)#exit
+
+SW-10-1>enable
+SW-10-1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+SW-10-1(config)#interface range FastEthernet 0/21 - 24
+SW-10-1(config-if-range)#shutdown
+
+
+
+
+SW-10-1(config-if-range)#channel-group 1 mode active
+SW-10-1(config-if-range)#no shutdown
+
+
+
+
+SW-10-1(config-if-range)#exit
+SW-10-1(config)#
+SW-10-1(config)#
+SW-10-1(config)#interface Port-channel 1
+SW-10-1(config-if)#switchport mode trunk
+SW-10-1(config-if)#switchport trunk allowed vlan 2,3
+SW-10-1(config-if)#description SW-10-Link
+SW-10-1(config-if)#no shutdown
+SW-10-1(config-if)#exit
+SW-10-1(config)#
+SW-10-1(config)#end
+SW-10-1#write memory
+
+
+SW-10-1>
+SW-10-1>enable
+SW-10-1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+SW-10-1(config)#hostname SW-10-1
+SW-10-1(config)#interface FastEthernet 0/11
+SW-10-1(config-if)#switchport mode access
+SW-10-1(config-if)#switchport port-security
+SW-10-1(config-if)#switchport port-security maximum 1
+SW-10-1(config-if)#switchport port-security mac-address sticky
+SW-10-1(config-if)#switchport port-security violation restrict
+SW-10-1(config-if)#exit
+SW-10-1(config)#interface FastEthernet 0/12
+SW-10-1(config-if)#switchport mode access
+SW-10-1(config-if)#switchport port-security
+SW-10-1(config-if)#switchport port-security maximum 1
+SW-10-1(config-if)#switchport port-security mac-address sticky
+SW-10-1(config-if)#switchport port-security violation restrict
+SW-10-1(config-if)#exit
+SW-10-1(config)#
+SW-10-1(config)#interface range FastEthernet 0/1 - 10, FastEthernet 0/13 - 20, GigabitEthernet 0/2
+SW-10-1(config-if-range)#shutdown

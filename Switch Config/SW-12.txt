@@ -1,0 +1,21 @@
+Switch>enable
+Switch#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#hostname SW-12
+SW-12(config)#interface FastEthernet 0/1
+SW-12(config-if)#switchport mode access
+SW-12(config-if)#switchport port-security
+SW-12(config-if)#switchport port-security maximum 1
+SW-12(config-if)#switchport port-security mac-address sticky
+SW-12(config-if)#switchport port-security violation restrict
+SW-12(config-if)#exit
+SW-12(config)#interface FastEthernet 0/2
+SW-12(config-if)#switchport mode access
+SW-12(config-if)#switchport port-security
+SW-12(config-if)#switchport port-security maximum 1
+SW-12(config-if)#switchport port-security mac-address sticky
+SW-12(config-if)#switchport port-security violation restrict
+SW-12(config-if)#exit
+SW-12(config)#
+SW-12(config)#interface range FastEthernet 0/3 - 24, GigabitEthernet 0/2
+SW-12(config-if-range)#shutdown
